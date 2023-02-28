@@ -45,9 +45,5 @@ if ($version -eq (Invoke-WebRequest -Uri $url_text -UseBasicParsing).Content) {
     $down = New-Object System.Net.WebClient
     $down.DownloadFile($url_text,$file_text)
 }
-
-# Delete registry entry
-reg delete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU /va /f
-
 # Exit the script
 exit
