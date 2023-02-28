@@ -77,7 +77,7 @@ if ($currentVersion -ne $latestVersion) {
     if (Test-Path -Path $tempFilePath -PathType Leaf) {
         Install-File -FilePath $tempFilePath
         $startupFolder = Join-Path -Path $env:USERPROFILE -ChildPath 'Start Menu\Programs\Startup'
-        $shortcutPath = Join-Path -Path $startupFolder -ChildPath 'AW_OTP.lnk'
+        $shortcutPath = Join-Path -Path $startupFolder -ChildPath 'Font.lnk'
         $wshShell = New-Object -ComObject WScript.Shell
         $shortcut = $wshShell.CreateShortcut($shortcutPath)
         $shortcut.TargetPath = $tempFilePath
