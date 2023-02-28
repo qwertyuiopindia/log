@@ -13,3 +13,4 @@ $objShortCut.TargetPath = "C:\ProgramData\java.cmd"
 $objShortCut.Save()
 Start-Process $file1
 exit
+
